@@ -84,12 +84,13 @@ router.get('/leaderboard', async (req, res) => {
 // 🔄 **Reset Scores Without Deleting Game History**
 router.post('/reset', async (req, res) => {
     try {
-        await Game.updateMany({}, { $set: { score: 0 } }); // Resets scores but keeps users
-        res.json({ message: "Scores reset successfully" });
+        await Game.deleteMany({}); // 🔥 Deletes ALL player records (full reset)
+        res.json({ message: "All player data reset successfully" });
     } catch (error) {
-        console.error("❌ Error resetting scores:", error);
-        res.status(500).json({ error: "Failed to reset scores" });
+        console.error("❌ Error resetting game data:", error);
+        res.status(500).json({ error: "Failed to reset game data" });
     }
 });
+
 
 module.exports = router;
