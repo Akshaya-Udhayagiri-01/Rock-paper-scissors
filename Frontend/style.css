@@ -1,8 +1,7 @@
-/* 🌠 Starry Animated Background */
+/* 🌌 Starry Night Background */
 body {
-    text-align: center;
     font-family: 'Poppins', sans-serif;
-    background: black;
+    text-align: center;
     color: white;
     min-height: 100vh;
     display: flex;
@@ -11,29 +10,28 @@ body {
     align-items: center;
     margin: 0;
     overflow: hidden;
-    position: relative;
+    background: black;
 }
 
-/* 🌟 Star Animation */
-@keyframes moveStars {
-    from { background-position: 0 0; }
-    to { background-position: -1000px 1000px; }
-}
-
-/* 🌟 Brighter & More Visible Starry Background */
+/* ✨ Star Animation */
 body::before {
     content: "";
-    position: absolute;
-    width: 300%;
-    height: 300%;
-    background: url('https://www.transparenttextures.com/patterns/stardust.png');
-    opacity: 0.6; /* Increased opacity to make stars brighter */
-    filter: brightness(1.8); /* Makes the stars more visible */
-    animation: moveStars 20s linear infinite;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://www.transparenttextures.com/patterns/stardust.png'); /* Star texture */
+    animation: starsMove 60s linear infinite;
+    opacity: 0.7;
 }
 
+@keyframes starsMove {
+    from { background-position: 0 0; }
+    to { background-position: -1000px -1000px; }
+}
 
-/* 🎮 Style the game container */
+/* 🎮 Game Container */
 .game-container {
     background: rgba(255, 255, 255, 0.2);
     padding: 20px;
@@ -41,148 +39,103 @@ body::before {
     box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.3);
     width: 90%;
     max-width: 500px;
-    position: relative;
-    z-index: 1;
+    transition: 0.3s ease-in-out;
 }
 
-/* 🏆 Style the title */
-h1 {
-    font-size: 36px;
-    margin-bottom: 15px;
-    text-shadow: 2px 2px 10px rgba(255, 255, 255, 0.5);
+/* 🏆 Leaderboard */
+#leaderboard {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 15px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 2px 2px 10px rgba(255, 255, 255, 0.3);
+    font-size: 18px;
+    text-align: center;
 }
 
-/* 🎭 Add spacing to the choices */
+/* 🎭 Choices (Rock, Paper, Scissors Buttons) */
 .choices {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
     margin: 20px 0;
 }
 
-/* 🖱️ Stylish buttons */
+/* 🎮 Game Buttons */
 .choices button {
-    font-size: 22px;
+    font-size: 18px;
     font-weight: bold;
     color: white;
     background: #ff5733;
     border: none;
-    padding: 15px 25px;
+    padding: 15px 20px;
     cursor: pointer;
     border-radius: 10px;
     transition: 0.3s;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 2px 2px 10px rgba(255, 255, 255, 0.3);
 }
 
-/* 🔥 Glow & Shrink Effect on Click */
-.choices button:active {
-    transform: scale(0.9); /* Shrinks slightly when clicked */
-    box-shadow: 0px 0px 20px rgba(255, 87, 51, 0.8); /* Adds a glow */
-    transition: transform 0.1s, box-shadow 0.1s;
+.choices button:hover {
+    background: #ff2e00;
+    transform: scale(1.1);
 }
 
-/* 🎭 Shake Animation */
-@keyframes shake {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    50% { transform: translateX(5px); }
-    75% { transform: translateX(-5px); }
-    100% { transform: translateX(0); }
-}
-
-.choices button.shake {
-    animation: shake 0.3s ease-in-out;
-}
-
-/* 🏆 Make the result box bigger */
+/* 🏆 Result Box */
 #result-box {
     background: rgba(255, 255, 255, 0.3);
-    padding: 25px;
+    padding: 20px;
     border-radius: 15px;
     width: 90%;
     max-width: 500px;
-    font-size: 23px;
+    font-size: 20px;
     font-weight: bold;
-    margin-top: 20px;
+    margin-top: 15px;
     text-align: center;
     box-shadow: 2px 2px 15px rgba(255, 255, 255, 0.3);
-    position: relative;
-    z-index: 1;
 }
 
-/* 🏆 Leaderboard Styling */
-#leaderboard {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 20px;
-    border-radius: 15px;
-    margin-top: 20px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 2px 2px 10px rgba(255, 255, 255, 0.3);
-    font-size: 20px;
-    text-align: center;
+/* 📱 RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+    .game-container {
+        max-width: 90%;
+    }
+
+    .choices button {
+        font-size: 16px;
+        padding: 12px 18px;
+    }
+
+    #result-box {
+        font-size: 18px;
+    }
 }
 
-#leaderboard h2 {
-    margin-bottom: 10px;
-}
+@media (max-width: 480px) {
+    .game-container {
+        padding: 15px;
+    }
 
-#leaderboard ol {
-    padding-left: 0;
-    list-style: none;
-}
+    .choices {
+        flex-direction: column;
+        gap: 15px;
+    }
 
-#leaderboard li {
-    font-size: 18px;
-    padding: 5px;
-    background: rgba(255, 255, 255, 0.3);
-    margin: 5px 0;
-    border-radius: 10px;
-}
+    .choices button {
+        font-size: 16px;
+        padding: 10px 16px;
+        width: 80%;
+    }
 
-/* 🎮 Game & Leaderboard Layout */
-.container {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    width: 90%;
-    max-width: 1000px;
-    margin: auto;
-}
+    #result-box {
+        font-size: 16px;
+        padding: 15px;
+    }
 
-/* 🎮 Game section (left side) */
-.game-container {
-    flex: 2;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.3);
-}
-
-/* 🏆 Leaderboard Section (Right Side) */
-#leaderboard-container {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 20px;
-    border-radius: 15px;
-    margin-left: 20px;
-    box-shadow: 2px 2px 10px rgba(255, 255, 255, 0.3);
-    font-size: 20px;
-    text-align: center;
-}
-
-#leaderboard-container h2 {
-    margin-bottom: 10px;
-}
-
-#leaderboard {
-    padding-left: 0;
-    list-style: none;
-}
-
-#leaderboard li {
-    font-size: 18px;
-    padding: 5px;
-    background: rgba(255, 255, 255, 0.3);
-    margin: 5px 0;
-    border-radius: 10px;
+    #leaderboard {
+        font-size: 16px;
+        padding: 10px;
+    }
 }
