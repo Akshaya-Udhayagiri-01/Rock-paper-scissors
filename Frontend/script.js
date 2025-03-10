@@ -55,14 +55,8 @@ async function updateLeaderboard() {
     }
 }
 
-// 🔄 Reset game data on refresh
+// 🔄 Load leaderboard on page load (No Reset)
 window.onload = async () => {
     document.getElementById('result').innerText = "Make your move!";
-    
-    try {
-        await fetch(`${API_URL}/api/game/reset`, { method: 'POST' });
-        updateLeaderboard();
-    } catch (error) {
-        console.error("Error resetting game data:", error);
-    }
+    updateLeaderboard(); // ✅ Only updates leaderboard, does NOT reset scores
 };
