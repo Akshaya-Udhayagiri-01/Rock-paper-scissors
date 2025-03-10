@@ -60,4 +60,35 @@ router.post('/play', async (req, res) => {
     });
 });
 
+// 🏆 **Leaderboard Route (Shows Players & Computer Scores)**
+router.get('/leaderboard', async (req, res) => {
+    try {
+        const leaderboard = await Game.aggregate([
+            {
+                $group: {
+                    _id: "$playerName",
+                    score: { $sum: "$score" } // Sum up scores
+                }
+            },
+            { $sort: { score: -1 } }
+        ]);
+
+        res.json(leaderboard);
+    } catch (error) {
+        console.error("❌ Error fetching leaderboard:", error);
+        res.status(500).json({ error: "Failed to load leaderboard" });
+    }
+});
+
+// 🔄 **Reset Scores Without Deleting Game History**
+router.post('/reset', async (req, res) => {
+    try {
+        await Game.updateMany({}, { $set: { score: 0 } }); // Reset scores to 0, keep history
+        res.json({ message: "Scores reset successfully" });
+    } catch (error) {
+        console.error("❌ Error resetting scores:", error);
+        res.status(500).json({ error: "Failed to reset scores" });
+    }
+});
+
 module.exports = router;
