@@ -20,8 +20,10 @@ function determineWinner(playerMove, computerMove) {
 }
 
 router.post('/play', async (req, res) => {
-    const { playerName, playerMove } = req.body;
+    let { playerName, playerMove } = req.body;
     if (!playerName) return res.status(400).json({ error: "Player name is required!" });
+
+    playerName = playerName.trim().toLowerCase(); // Convert to lowercase for consistency
 
     const computerMove = getComputerMove();
     const result = determineWinner(playerMove, computerMove);
@@ -42,14 +44,14 @@ router.post('/play', async (req, res) => {
 
     // Update total computer score
     await Game.updateOne(
-        { playerName: "Computer" },
+        { playerName: "computer" }, // Stored as lowercase
         { $inc: { score: computerScoreChange } },
         { upsert: true }
     );
 
     // Fetch updated scores (default to 0 if not found)
     const updatedPlayer = await Game.findOne({ playerName }) || { score: 0 };
-    const updatedComputer = await Game.findOne({ playerName: "Computer" }) || { score: 0 };
+    const updatedComputer = await Game.findOne({ playerName: "computer" }) || { score: 0 };
 
     res.json({
         playerMove,
@@ -66,7 +68,7 @@ router.get('/leaderboard', async (req, res) => {
         const leaderboard = await Game.aggregate([
             {
                 $group: {
-                    _id: "$playerName",
+                    _id: { $toLower: "$playerName" }, // Convert names to lowercase
                     score: { $sum: "$score" } // Sum up scores
                 }
             },
