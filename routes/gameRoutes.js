@@ -26,11 +26,8 @@ router.post('/play', async (req, res) => {
     const computerMove = getComputerMove();
     const result = determineWinner(playerMove, computerMove);
 
-    let playerScoreChange = 0;
-    let computerScoreChange = 0;
-
-    if (result === 'Win') playerScoreChange = 1;
-    if (result === 'Lose') computerScoreChange = 1;
+    let playerScoreChange = result === 'Win' ? 1 : 0;
+    let computerScoreChange = result === 'Lose' ? 1 : 0;
 
     // Save individual game result
     const newGame = new Game({ playerName, playerMove, computerMove, result });
@@ -42,7 +39,6 @@ router.post('/play', async (req, res) => {
         { $inc: { score: playerScoreChange } },
         { upsert: true }
     );
-    
 
     // Update total computer score
     await Game.updateOne(
@@ -50,33 +46,18 @@ router.post('/play', async (req, res) => {
         { $inc: { score: computerScoreChange } },
         { upsert: true }
     );
-    
 
-    console.log("✅ Game result saved:", newGame);
+    // Fetch updated scores (default to 0 if not found)
+    const updatedPlayer = await Game.findOne({ playerName }) || { score: 0 };
+    const updatedComputer = await Game.findOne({ playerName: "Computer" }) || { score: 0 };
 
-    res.json({ playerMove, computerMove, result, playerScore: player.score, computerScore: computer.score });
+    res.json({
+        playerMove,
+        computerMove,
+        result,
+        playerScore: updatedPlayer.score,
+        computerScore: updatedComputer.score
+    });
 });
-
-// 🏆 Fetch Leaderboard (Shows Player & Computer Scores)
-router.get('/leaderboard', async (req, res) => {
-    const leaderboard = await Game.aggregate([
-        {
-            $group: {
-                _id: "$playerName",
-                score: { $sum: "$score" } // Sum up scores
-            }
-        },
-        { $sort: { score: -1 } }
-    ]);
-
-    res.json(leaderboard);
-});
-
-// 🔄 Reset all game records on refresh
-router.post('/reset', async (req, res) => {
-    await Game.updateMany({}, { $set: { score: 0 } }); // Resets scores but keeps past games
-    res.json({ message: "Scores reset successfully" });
-});
-
 
 module.exports = router;
