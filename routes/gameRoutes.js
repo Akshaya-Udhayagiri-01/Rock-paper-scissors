@@ -37,18 +37,20 @@ router.post('/play', async (req, res) => {
     await newGame.save();
 
     // Update total player score
-    let player = await Game.findOneAndUpdate(
+    await Game.updateOne(
         { playerName },
         { $inc: { score: playerScoreChange } },
-        { new: true, upsert: true }
+        { upsert: true }
     );
+    
 
     // Update total computer score
-    let computer = await Game.findOneAndUpdate(
+    await Game.updateOne(
         { playerName: "Computer" },
         { $inc: { score: computerScoreChange } },
-        { new: true, upsert: true }
+        { upsert: true }
     );
+    
 
     console.log("✅ Game result saved:", newGame);
 
@@ -72,8 +74,9 @@ router.get('/leaderboard', async (req, res) => {
 
 // 🔄 Reset all game records on refresh
 router.post('/reset', async (req, res) => {
-    await Game.deleteMany({});
-    res.json({ message: "Game history reset successfully" });
+    await Game.updateMany({}, { $set: { score: 0 } }); // Resets scores but keeps past games
+    res.json({ message: "Scores reset successfully" });
 });
+
 
 module.exports = router;
