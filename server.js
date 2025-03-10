@@ -1,68 +1,30 @@
-const API_URL = "https://rock-paper-scissors-mvoi.onrender.com"; // Your Render API URL
+const path = require('path');
+require('dotenv').config();
 
-// Clear previous game data on refresh
-localStorage.removeItem("playerName");
+console.log("DEBUG: MONGO_URI =", process.env.MONGO_URI || "❌ Not Loaded!"); // Debug log
 
-let playerName = prompt("Enter your name:");
-if (!playerName) playerName = "Guest"; // Default name if empty
-localStorage.setItem("playerName", playerName);
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
 
-async function playGame(playerMove) {
-    try {
-        const response = await fetch(`${API_URL}/api/game/play`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ playerName, playerMove })
-        });
+const gameRoutes = require('./routes/gameRoutes');
 
-        if (!response.ok) {
-            throw new Error(`Server error: ${response.status}`);
-        }
+const app = express();
+app.use(express.json());
+app.use(cors());
 
-        const data = await response.json();
-        document.getElementById('result').innerText = 
-            `You: ${data.playerMove} | Computer: ${data.computerMove} | Result: ${data.result}`;
+const PORT = process.env.PORT || 5000;
+const MONGO_URI = process.env.MONGO_URI;
 
-        updateLeaderboard();
-    } catch (error) {
-        console.error("Error playing game:", error);
-        alert("Failed to connect to the server. Please try again later.");
-    }
+if (!MONGO_URI) {
+    console.error("❌ ERROR: MONGO_URI is not defined! Check your .env file or Render Environment Variables.");
+    process.exit(1);
 }
 
-// 🏆 Fetch & Display Leaderboard (Player & Computer Scores)
-async function updateLeaderboard() {
-    try {
-        const response = await fetch(`${API_URL}/api/game/leaderboard`);
-        
-        if (!response.ok) {
-            throw new Error(`Server error: ${response.status}`);
-        }
+mongoose.connect(MONGO_URI)
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
-        const leaderboard = await response.json();
-        let leaderboardHTML = "<h2>Leaderboard</h2><ul>";
-        leaderboard.forEach(player => {
-            if (player._id) {
-                leaderboardHTML += `<li>${player._id}: ${player.score} points</li>`;
-            }
-        });
-        leaderboardHTML += "</ul>";
+app.use('/api/game', gameRoutes);
 
-        document.getElementById('leaderboard').innerHTML = leaderboardHTML;
-    } catch (error) {
-        console.error("Error fetching leaderboard:", error);
-        document.getElementById('leaderboard').innerHTML = "<h2>Leaderboard</h2><p>Error loading leaderboard</p>";
-    }
-}
-
-// 🔄 Reset game data on refresh
-window.onload = async () => {
-    document.getElementById('result').innerText = "Make your move!";
-    
-    try {
-        await fetch(`${API_URL}/api/game/reset`, { method: 'POST' });
-        updateLeaderboard();
-    } catch (error) {
-        console.error("Error resetting game data:", error);
-    }
-};
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
