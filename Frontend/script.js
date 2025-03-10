@@ -1,4 +1,4 @@
-const API_URL = "https://rock-paper-scissors-mvoi.onrender.com"; // Your Render API URL
+const API_URL = "https://rock-paper-scissors-mvoi.onrender.com"; // ✅ Use your Render backend URL
 
 // Clear previous game data on refresh
 localStorage.removeItem("playerName");
